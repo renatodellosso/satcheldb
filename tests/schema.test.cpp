@@ -64,6 +64,7 @@ TEST_CASE("returns false for schema with an ID column in the wrong index", "[isV
 
   REQUIRE(!isValidSchema(schema));
 
-  schema.nameToIndex = std::unordered_map<char*, int>();
+  schema.nameToIndex = std::unordered_map<char*, int>(); // Remove col name
+  schema.colTypes[0] = VT_INT;
   REQUIRE(!isValidSchema(schema));
 }
