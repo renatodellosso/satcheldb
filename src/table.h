@@ -1,5 +1,4 @@
-#ifndef TABLE_H
-#define TABLE_H
+#pragma once
 
 #include "row.h"
 #include "schema.h"
@@ -19,5 +18,3 @@ class Table {
   private:
     Schema schema;
 };
-
-#endif

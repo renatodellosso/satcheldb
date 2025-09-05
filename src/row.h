@@ -1,5 +1,4 @@
-#ifndef ROW_H
-#define ROW_H
+#pragma once
 
 enum ValueType {
   VT_INT,
@@ -27,5 +26,3 @@ struct UnsanitizedRow {
 };
 
 Row extractData(UnsanitizedRow unsanitized);
-
-#endif

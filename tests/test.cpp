@@ -3,10 +3,7 @@
 
 TEST_CASE("isValidSchema", "[schema]") {
   std::unordered_map<char*, int> nameToIndex;
-  char* key = new char[3] {
-    'i', 'd', '\0'
-  };
-  nameToIndex[key] = 0;
+  nameToIndex[(char*)"id"] = 0;
 
   Schema schema = {
     1,

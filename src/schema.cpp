@@ -10,5 +10,5 @@ bool isValidSchema(Schema schema) {
   if (schema.nameToIndex[(char*)"id"] != 0)
     return false;
 
-  return false;
+  return true;
 }

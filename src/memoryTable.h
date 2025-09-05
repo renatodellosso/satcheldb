@@ -1,5 +1,4 @@
-#ifndef MEMORY_TABLE_H
-#define MEMORY_TABLE_H
+#pragma once
 
 #include "table.h"
 #include <unordered_map>
@@ -12,5 +11,3 @@ class MemoryTable : public Table {
   private:
     std::unordered_map<int, Row> rows;
 };
-
-#endif

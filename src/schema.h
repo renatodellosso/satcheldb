@@ -1,6 +1,4 @@
-#ifndef SCHEMA_H
-#define SCHEMA_H
-
+#pragma once
 #include "row.h"
 #include <unordered_map>
 
@@ -11,5 +9,3 @@ struct Schema {
 };
 
 bool isValidSchema(Schema schema);
-
-#endif
