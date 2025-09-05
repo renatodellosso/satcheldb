@@ -7,6 +7,8 @@ bool isValidSchema(Schema schema) {
   // Check for ID col
   if (schema.colTypes[0] != VT_INT)
     return false;
-  if (schema.nameToIndex["id"] != 0)
+  if (schema.nameToIndex[(char*)"id"] != 0)
     return false;
+
+  return false;
 }

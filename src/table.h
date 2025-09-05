@@ -13,9 +13,9 @@ class Table {
     bool insert(UnsanitizedRow row);
     Row get(int id);
   protected:
-    virtual bool isIdTaken(int id);
-    virtual bool insertRaw(Row row);
-    virtual Row getRaw(int id);
+    virtual bool isIdTaken(int id) = 0;
+    virtual bool insertRaw(Row row) = 0;
+    virtual Row getRaw(int id) = 0;
   private:
     Schema schema;
 };

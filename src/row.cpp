@@ -5,4 +5,5 @@ Row extractData(UnsanitizedRow unsanitized) {
   for (int i = 0; i < unsanitized.len; i++) {
     sanitized[i] = unsanitized.cols[i].data;
   }
+  return sanitized;
 }

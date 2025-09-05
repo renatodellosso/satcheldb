@@ -5,8 +5,6 @@
 #include <unordered_map>
 
 class MemoryTable : public Table {
-  public:
-    bool MemoryTable::insert(UnsanitizedRow row);
   protected:
     virtual bool isIdTaken(int id);
     virtual bool insertRaw(Row row);
