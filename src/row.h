@@ -1,5 +1,5 @@
-#ifndef VALUE_H
-#define VALUE_H
+#ifndef ROW_H
+#define ROW_H
 
 enum ValueType {
   VT_INT,
@@ -19,5 +19,13 @@ struct TypedValue {
   ValueType type;
   Value data;
 };
+
+typedef Value* Row;
+struct UnsanitizedRow {
+  TypedValue* cols;
+  int len;
+};
+
+Row extractData(UnsanitizedRow unsanitized);
 
 #endif
