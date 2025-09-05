@@ -7,6 +7,8 @@ file(GLOB_RECURSE SOURCES "src/*.cpp" "src/*.h")
 
 add_executable(SatchelDb main.cpp ${SOURCES})
 
+file(GLOB_RECURSE TESTS "tests/*.cpp" "tests/*.h")
+
 find_package(Catch2 3 REQUIRED)
-add_executable(tests tests/test.cpp ${SOURCES})
+add_executable(tests ${TESTS} ${SOURCES})
 target_link_libraries(tests PRIVATE Catch2::Catch2WithMain)
