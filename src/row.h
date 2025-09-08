@@ -25,4 +25,7 @@ struct UnsanitizedRow {
   int len;
 };
 
+/**
+ * Converts an unsanitized row into a row
+ */
 Row extractData(UnsanitizedRow unsanitized);
