@@ -37,13 +37,9 @@ bool MemoryTable::rowMatchesQuery(Row row, QueryWithIndices query) {
 }
 
 Row MemoryTable::findOne(Query query) {
-  // throw std::invalid_argument("findOneing...");
-
   QueryWithIndices indexedQuery = addIndicesToQuery(query);
   if (indexedQuery.size() == 0)
     return NULL;
-
-  // throw std::invalid_argument("Indexed query");
 
   QueryEntryWithIndex id = indexedQuery[0];
   if (id.index == 0 && id.type == QUERY_EQ) {
@@ -53,16 +49,12 @@ Row MemoryTable::findOne(Query query) {
     return NULL;
   }
 
-  // throw std::invalid_argument("No ID shortcuts");
-
   for (auto ptr = rows.begin(); ptr != rows.end(); ptr++) {
     Row row = ptr->second;
 
     if (rowMatchesQuery(row, indexedQuery))
       return row;
   }
-
-  // throw std::invalid_argument("No row matches the query");
 
   return NULL;
 }
