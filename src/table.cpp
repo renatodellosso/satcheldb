@@ -8,18 +8,35 @@ Table::Table(Schema schema) {
   this->schema = schema;
 }
 
-bool Table::isValidRow(UnsanitizedRow row) {
-  if (this->schema.colCount != row.len)
-    return false;
+// #define DEBUG_IS_VALID_ROW_CAUSES
 
-  for (int i = 0; i < this->schema.colCount; i++) {
-    if (row.cols[i].type != this->schema.colTypes[i])
-      return false;
+bool Table::isValidRow(UnsanitizedRow row) {
+  // IDs must be >=0
+  if (row.len < 1 || row.cols[0].data.i < 0) {
+#ifdef DEBUG_IS_VALID_ROW_CAUSES
+    throw std::invalid_argument("Invalid ID");
+#else
+    return false;
+#endif
   }
 
-  // IDs must be >=0
-  if (row.cols[0].data.i < 0)
+  if (this->schema.colCount != row.len) {
+#ifdef DEBUG_IS_VALID_ROW_CAUSES
+    throw std::invalid_argument("Wrong colCount");
+#else
     return false;
+#endif
+  }
+
+  for (int i = 0; i < this->schema.colCount; i++) {
+    if (row.cols[i].type != this->schema.colTypes[i]) {
+#ifdef DEBUG_IS_VALID_ROW_CAUSES
+    throw std::invalid_argument("Wrong column type");
+#else
+    return false;
+#endif
+    }
+  }
 
   return true;
 }
@@ -29,9 +46,6 @@ bool Table::insert(UnsanitizedRow row) {
     return false;
 
   Row toInsert = extractData(row);
-
-  if (isIdTaken(toInsert[0].i))
-    return false;
 
   return insertRaw(toInsert);
 }

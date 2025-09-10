@@ -4,6 +4,8 @@
 #include <unordered_map>
 
 class MemoryTable : public Table {
+  public:
+    MemoryTable(Schema schema);
   protected:
     virtual bool isIdTaken(int id);
     virtual bool insertRaw(Row row);
