@@ -56,3 +56,42 @@ Row Table::get(int id) {
 
   return getRaw(id);
 }
+
+void moveIdToFrontOfQuery(QueryWithIndices* query) {
+  for (int i = 0; i < query->size(); i++) {
+    if ((*query)[0].index == 0) {
+      QueryEntryWithIndex entry = (*query)[i];
+      query->erase(query->begin() + i);
+      query->insert(query->begin(), entry);
+      break;
+    }
+  }
+}
+
+QueryWithIndices Table::addIndicesToQuery(Query query) {
+  QueryWithIndices indexedQuery;
+
+  for (auto ptr = query.begin(); ptr != query.end(); ptr++) {
+    QueryEntryWithIndex indexedEntry = addIndicesToQueryEntry(ptr->first, ptr->second);
+    if (indexedEntry.index == -1)
+      throw std::invalid_argument("Invalid query");
+    indexedQuery.push_back(indexedEntry);
+  }
+
+  moveIdToFrontOfQuery(&indexedQuery);
+  return indexedQuery;
+}
+
+QueryEntryWithIndex Table::addIndicesToQueryEntry(char* key, QueryEntry entry) {
+    if (schema.nameToIndex.find(key) == schema.nameToIndex.end()) {
+      return {
+        QUERY_EQ, NULL, -1
+      };
+    }
+
+    int index = schema.nameToIndex[key];
+    QueryEntryWithIndex indexedEntry = {
+      entry.type, entry.value, index
+    };
+    return indexedEntry;
+}

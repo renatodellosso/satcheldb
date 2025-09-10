@@ -11,10 +11,13 @@ class Table {
     bool isValidRow(UnsanitizedRow row);
     bool insert(UnsanitizedRow row);
     Row get(int id);
+    virtual Row findOne(Query query) = 0;
+    virtual long size() = 0;
   protected:
     virtual bool isIdTaken(int id) = 0;
     virtual bool insertRaw(Row row) = 0;
     virtual Row getRaw(int id) = 0;
-  private:
+    QueryWithIndices addIndicesToQuery(Query query);
+    QueryEntryWithIndex addIndicesToQueryEntry(char* key, QueryEntry entry);
     Schema schema;
 };

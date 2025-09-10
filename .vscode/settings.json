@@ -57,6 +57,27 @@
     "iomanip": "cpp",
     "numbers": "cpp",
     "semaphore": "cpp",
-    "span": "cpp"
+    "span": "cpp",
+    "list": "cpp",
+    "regex": "cpp",
+    "scoped_allocator": "cpp",
+    "chrono": "cpp",
+    "expected": "cpp",
+    "format": "cpp",
+    "ranges": "cpp",
+    "system_error": "cpp",
+    "functional": "cpp",
+    "type_traits": "cpp",
+    "utility": "cpp",
+    "__tree": "cpp",
+    "map": "cpp",
+    "set": "cpp",
+    "unordered_set": "cpp",
+    "valarray": "cpp",
+    "flat_map": "cpp",
+    "flat_set": "cpp",
+    "generator": "cpp",
+    "stacktrace": "cpp",
+    "text_encoding": "cpp"
   }
 }

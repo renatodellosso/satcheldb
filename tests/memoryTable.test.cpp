@@ -121,3 +121,127 @@ TEST_CASE("get returns NULL for invalid ID") {
     return table.get(-1);
   };
 }
+
+TEST_CASE("findOne works with single query") {
+  MemoryTable table = getTable();
+  UnsanitizedRow row = getTestRow(1, 2.0f, "3");
+
+  table.insert(row);
+  table.insert(getTestRow(2, 3.0f, "4"));
+
+  Query query = {
+    { 
+      (char*)"id", 
+      {
+        QUERY_EQ,
+        {
+          .i = 1
+        }
+      } 
+    }
+  };
+
+  Row result = table.findOne(query);
+  REQUIRE(areValuesEqual(VT_INT, result[0], row.cols[0].data));
+  REQUIRE(areValuesEqual(VT_FLOAT, result[1], row.cols[1].data));
+  REQUIRE(areValuesEqual(VT_STRING, result[2], row.cols[2].data));
+
+  BENCHMARK("findOne existing with single int entry") {
+    return table.findOne(query);
+  };
+
+  query = {
+    { 
+      (char*)"num", 
+      {
+        QUERY_EQ,
+        {
+          .f = 2.0f
+        }
+      }
+    }
+  };
+
+  result = table.findOne(query);
+  REQUIRE(areValuesEqual(VT_INT, result[0], row.cols[0].data));
+  REQUIRE(areValuesEqual(VT_FLOAT, result[1], row.cols[1].data));
+  REQUIRE(areValuesEqual(VT_STRING, result[2], row.cols[2].data));
+
+  BENCHMARK("findOne existing with single float entry") {
+    return table.findOne(query);
+  };
+
+  query = {
+    { 
+      (char*)"name", 
+      {
+        QUERY_EQ,
+        {
+          .str = (char*)"3"
+        }
+      }
+    }
+  };
+
+  result = table.findOne(query);
+  REQUIRE(areValuesEqual(VT_INT, result[0], row.cols[0].data));
+  REQUIRE(areValuesEqual(VT_FLOAT, result[1], row.cols[1].data));
+  REQUIRE(areValuesEqual(VT_STRING, result[2], row.cols[2].data));
+
+  BENCHMARK("findOne existing with single string entry") {
+    return table.findOne(query);
+  };
+
+  // Benchmark larger tables
+  for(int i = 100; table.size() < 1000000; i++) {
+    table.insert(getTestRow(i, 3.0f + i/10.0f, "4"));
+  }
+
+  query = {
+    {
+      (char*)"id", 
+      {
+        QUERY_EQ,
+        {
+          .i = 1
+        }
+      } 
+    }
+  };
+
+  BENCHMARK("findOne existing with single int entry in large table") {
+    return table.findOne(query);
+  };
+
+  query = {
+    { 
+      (char*)"num", 
+      {
+        QUERY_EQ,
+        {
+          .f = 2.0f
+        }
+      }
+    }
+  };
+
+  BENCHMARK("findOne existing with single float entry in large table") {
+    return table.findOne(query);
+  };
+
+  query = {
+    { 
+      (char*)"name", 
+      {
+        QUERY_EQ,
+        {
+          .str = (char*)"3"
+        }
+      }
+    }
+  };
+
+  BENCHMARK("findOne existing with single string entry in large table") {
+    return table.findOne(query);
+  };
+}
