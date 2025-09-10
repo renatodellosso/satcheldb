@@ -245,3 +245,95 @@ TEST_CASE("findOne works with single query") {
     return table.findOne(query);
   };
 }
+
+TEST_CASE("findOne works with multiple-entry query") {
+  MemoryTable table = getTable();
+  UnsanitizedRow row = getTestRow(1, 2.0f, "3");
+
+  table.insert(row);
+  table.insert(getTestRow(2, 3.0f, "4"));
+
+  Query query = {
+    { 
+      (char*)"num", 
+      {
+        QUERY_EQ,
+        {
+          .f = 2.0f
+        }
+      }
+    },
+    { 
+      (char*)"name", 
+      {
+        QUERY_EQ,
+        {
+          .str = (char*)"3"
+        }
+      }
+    }
+  };
+
+  Row result = table.findOne(query);
+  REQUIRE(areValuesEqual(VT_INT, result[0], row.cols[0].data));
+  REQUIRE(areValuesEqual(VT_FLOAT, result[1], row.cols[1].data));
+  REQUIRE(areValuesEqual(VT_STRING, result[2], row.cols[2].data));
+
+  BENCHMARK("findOne existing with multiple-entry query") {
+    return table.findOne(query);
+  };
+
+  // Benchmark larger tables
+  for(int i = 100; table.size() < 1000000; i++) {
+    table.insert(getTestRow(i, i % 5 == 0 ? 2.0f : 4.0f, "4"));
+  }
+
+  BENCHMARK("findOne existing with multiple-entry query in large table") {
+    return table.findOne(query);
+  };
+}
+
+TEST_CASE("findOne returns NULL for non-existing result") {
+  MemoryTable table = getTable();
+  UnsanitizedRow row = getTestRow(1, 2.0f, "3");
+
+  table.insert(row);
+  table.insert(getTestRow(2, 3.0f, "4"));
+
+  Query query = {
+    { 
+      (char*)"num", 
+      {
+        QUERY_EQ,
+        {
+          .f = 3.0f
+        }
+      }
+    },
+    { 
+      (char*)"name", 
+      {
+        QUERY_EQ,
+        {
+          .str = (char*)"3"
+        }
+      }
+    }
+  };
+
+  Row result = table.findOne(query);
+  REQUIRE(result == NULL);
+
+  BENCHMARK("findOne non-existing with multiple-entry query") {
+    return table.findOne(query);
+  };
+
+  // Benchmark larger tables
+  for(int i = 100; table.size() < 1000000; i++) {
+    table.insert(getTestRow(i, i % 5 == 0 ? 2.0f : 4.0f, "4"));
+  }
+
+  BENCHMARK("findOne non-existing with multiple-entry query in large table") {
+    return table.findOne(query);
+  };
+}
