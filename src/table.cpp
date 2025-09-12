@@ -95,3 +95,7 @@ QueryEntryWithIndex Table::addIndicesToQueryEntry(char* key, QueryEntry entry) {
     };
     return indexedEntry;
 }
+
+Schema Table::getSchema() {
+  return schema;
+}

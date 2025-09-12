@@ -1,6 +1,9 @@
 #pragma once
 
 #include <unordered_map>
+// #include "schema.h"
+
+struct Schema; // Forward declare to handle circular includes
 
 enum ValueType {
   VT_INT,
@@ -31,6 +34,7 @@ struct UnsanitizedRow {
  * Converts an unsanitized row into a row
  */
 Row extractData(UnsanitizedRow unsanitized);
+bool areRowsEqual(Schema schema, Row row, UnsanitizedRow other);
 
 TypedValue value(ValueType type, Value data);
 TypedValue intVal(int i);

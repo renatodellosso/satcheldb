@@ -7,6 +7,7 @@ class MemoryTable : public Table {
   public:
     MemoryTable(Schema schema);
     virtual Row findOne(Query query);
+    virtual std::vector<Row> findMany(Query query);
     virtual long size();
   protected:
     virtual bool isIdTaken(int id);

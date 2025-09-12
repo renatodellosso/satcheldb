@@ -1,5 +1,6 @@
 #include "row.h"
 #include <string>
+#include "schema.h"
 
 Row extractData(UnsanitizedRow unsanitized) {
   Row sanitized = new Value[unsanitized.len];
@@ -7,6 +8,18 @@ Row extractData(UnsanitizedRow unsanitized) {
     sanitized[i] = unsanitized.cols[i].data;
   }
   return sanitized;
+}
+
+bool areRowsEqual(Schema schema, Row row, UnsanitizedRow other) {
+  if (schema.colCount != other.len)
+    return false;
+
+  for (int i = 0; i < schema.colCount; i++) {
+    if (schema.colTypes[i] != other.cols[i].type || !areValuesEqual(schema.colTypes[i], row[i], other.cols[i].data))
+      return false;
+  }
+
+  return true;
 }
 
 TypedValue value(ValueType type, Value data) {

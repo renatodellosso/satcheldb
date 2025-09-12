@@ -12,7 +12,9 @@ class Table {
     bool insert(UnsanitizedRow row);
     Row get(int id);
     virtual Row findOne(Query query) = 0;
+    virtual std::vector<Row> findMany(Query query) = 0;
     virtual long size() = 0;
+    Schema getSchema();
   protected:
     virtual bool isIdTaken(int id) = 0;
     virtual bool insertRaw(Row row) = 0;

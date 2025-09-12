@@ -59,6 +59,31 @@ Row MemoryTable::findOne(Query query) {
   return NULL;
 }
 
+std::vector<Row> MemoryTable::findMany(Query query) {
+  QueryWithIndices indexedQuery = addIndicesToQuery(query);
+  if (indexedQuery.size() == 0)
+    return std::vector<Row>();
+
+  QueryEntryWithIndex id = indexedQuery[0];
+  std::vector<Row> result;
+  if (id.index == 0 && id.type == QUERY_EQ) {
+    Row row = rows[id.value.i];
+    if (rowMatchesQuery(row, indexedQuery)) {
+      result.push_back(row);
+      return result;
+    }
+  }
+
+  for (auto ptr = rows.begin(); ptr != rows.end(); ptr++) {
+    Row row = ptr->second;
+
+    if (rowMatchesQuery(row, indexedQuery))
+      result.push_back(row);
+  }
+
+  return result;
+}
+
 long MemoryTable::size() {
   return rows.size();
 }
