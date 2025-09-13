@@ -15,6 +15,6 @@ class MemoryTable : public Table {
     virtual Row getRaw(int id);
   private:
     std::unordered_map<int, Row> rows;
-    bool rowMatchesQuery(Row row, QueryWithIndices query);
-    bool entryMatchesRow(Row row, QueryEntryWithIndex entry);
+    bool rowMatchesQuery(Row row, IndexedQuery query);
+    bool entryMatchesRow(Row row, IndexedQueryEntry entry);
 };

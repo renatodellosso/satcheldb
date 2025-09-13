@@ -1,7 +1,6 @@
 #pragma once
 
 #include <unordered_map>
-// #include "schema.h"
 
 struct Schema; // Forward declare to handle circular includes
 
@@ -53,10 +52,29 @@ struct QueryEntry {
 
 typedef std::unordered_map<char*, QueryEntry> Query;
 
-struct QueryEntryWithIndex {
+struct IndexedQueryEntry {
   QueryEntryType type;
   Value value;
   int index;
 };
 
-typedef std::vector<QueryEntryWithIndex> QueryWithIndices;
+typedef std::vector<IndexedQueryEntry> IndexedQuery;
+
+enum UpdateEntryType {
+  UPDATE_SET
+};
+
+struct UpdateEntry {
+  UpdateEntryType type;
+  Value value;
+};
+
+typedef std::unordered_map<char*, UpdateEntry> Update;
+
+struct IndexedUpdateEntry {
+  UpdateEntryType type;
+  Value value;
+  int index;
+};
+
+typedef std::vector<IndexedUpdateEntry> IndexedUpdate;

@@ -429,3 +429,41 @@ TEST_CASE("findMany works with single query") {
     return table.findMany(query);
   };
 }
+
+TEST_CASE("updateOne works with single query") {
+  MemoryTable table = getTable();
+  UnsanitizedRow row = getTestRow(1, 2.0f, "3");
+
+  table.insert(row);
+  table.insert(getTestRow(2, 3.0f, "4"));
+
+  Query query = {
+    { 
+      (char*)"id", 
+      {
+        QUERY_EQ,
+        {
+          .i = 1
+        }
+      } 
+    }
+  };
+
+  Update update = {
+    {
+      (char*)"num",
+      {
+        UPDATE_SET,
+        {
+          .f = 3.0f
+        }
+      }
+    }
+  };
+
+  table.updateOne(query, update);
+
+  Row found = table.findOne(query);
+  UnsanitizedRow expected = getTestRow(1, 3.0f, "3");
+  REQUIRE(areRowsEqual(table.getSchema(), found, expected));
+}

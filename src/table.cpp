@@ -57,10 +57,39 @@ Row Table::get(int id) {
   return getRaw(id);
 }
 
-void moveIdToFrontOfQuery(QueryWithIndices* query) {
+void applyUpdateEntry(Row row, IndexedUpdateEntry entry) {
+  switch (entry.type)
+  {
+  case UPDATE_SET:
+    row[entry.index] = entry.value;
+    break;
+  
+  default:
+    throw std::invalid_argument("Unknown entry type");
+  }
+}
+
+void applyUpdate(Row row, IndexedUpdate update) {
+  for (auto ptr : update) {
+    applyUpdateEntry(row, ptr);
+  }
+}
+
+bool Table::updateOne(Query query, Update update) {
+  Row row = findOne(query);
+  if (row == NULL)
+    return false;
+
+  IndexedUpdate indexedUpdate = addIndicesToUpdate(update);
+
+  applyUpdate(row, indexedUpdate);
+  return true;
+}
+
+void moveIdToFrontOfQuery(IndexedQuery* query) {
   for (int i = 0; i < query->size(); i++) {
     if ((*query)[0].index == 0) {
-      QueryEntryWithIndex entry = (*query)[i];
+      IndexedQueryEntry entry = (*query)[i];
       query->erase(query->begin() + i);
       query->insert(query->begin(), entry);
       break;
@@ -68,11 +97,11 @@ void moveIdToFrontOfQuery(QueryWithIndices* query) {
   }
 }
 
-QueryWithIndices Table::addIndicesToQuery(Query query) {
-  QueryWithIndices indexedQuery;
+IndexedQuery Table::addIndicesToQuery(Query query) {
+  IndexedQuery indexedQuery;
 
   for (auto ptr = query.begin(); ptr != query.end(); ptr++) {
-    QueryEntryWithIndex indexedEntry = addIndicesToQueryEntry(ptr->first, ptr->second);
+    IndexedQueryEntry indexedEntry = addIndicesToQueryEntry(ptr->first, ptr->second);
     if (indexedEntry.index == -1)
       throw std::invalid_argument("Invalid query");
     indexedQuery.push_back(indexedEntry);
@@ -82,7 +111,7 @@ QueryWithIndices Table::addIndicesToQuery(Query query) {
   return indexedQuery;
 }
 
-QueryEntryWithIndex Table::addIndicesToQueryEntry(char* key, QueryEntry entry) {
+IndexedQueryEntry Table::addIndicesToQueryEntry(char* key, QueryEntry entry) {
     if (schema.nameToIndex.find(key) == schema.nameToIndex.end()) {
       return {
         QUERY_EQ, NULL, -1
@@ -90,10 +119,49 @@ QueryEntryWithIndex Table::addIndicesToQueryEntry(char* key, QueryEntry entry) {
     }
 
     int index = schema.nameToIndex[key];
-    QueryEntryWithIndex indexedEntry = {
+    IndexedQueryEntry indexedEntry = {
       entry.type, entry.value, index
     };
     return indexedEntry;
+}
+
+void moveIdToFrontOfUpdate(IndexedUpdate* update) {
+  for (int i = 0; i < update->size(); i++) {
+    if ((*update)[0].index == 0) {
+      IndexedUpdateEntry entry = (*update)[i];
+      update->erase(update->begin() + i);
+      update->insert(update->begin(), entry);
+      break;
+    }
+  }
+}
+
+IndexedUpdate Table::addIndicesToUpdate(Update update) {
+  IndexedUpdate indexedUpdate;
+
+  for (auto ptr = update.begin(); ptr != update.end(); ptr++) {
+    IndexedUpdateEntry indexedEntry = addIndicesToUpdateEntry(ptr->first, ptr->second);
+    if (indexedEntry.index == -1)
+      throw std::invalid_argument("Invalid update");
+    indexedUpdate.push_back(indexedEntry);
+  }
+
+  moveIdToFrontOfUpdate(&indexedUpdate);
+  return indexedUpdate;
+}
+
+IndexedUpdateEntry Table::addIndicesToUpdateEntry(char* key, UpdateEntry entry) {
+  if (schema.nameToIndex.find(key) == schema.nameToIndex.end()) {
+    return {
+      UPDATE_SET, NULL, -1
+    };
+  }
+
+  int index = schema.nameToIndex[key];
+  IndexedUpdateEntry indexedEntry = {
+    entry.type, entry.value, index
+  };
+  return indexedEntry;
 }
 
 Schema Table::getSchema() {

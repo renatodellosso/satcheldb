@@ -15,7 +15,7 @@ Row MemoryTable::getRaw(int id) {
   return rows[id];
 }
 
-bool MemoryTable::entryMatchesRow(Row row, QueryEntryWithIndex entry) {
+bool MemoryTable::entryMatchesRow(Row row, IndexedQueryEntry entry) {
   Value val = row[entry.index];
 
   switch (entry.type)
@@ -27,7 +27,7 @@ bool MemoryTable::entryMatchesRow(Row row, QueryEntryWithIndex entry) {
   }
 }
 
-bool MemoryTable::rowMatchesQuery(Row row, QueryWithIndices query) {
+bool MemoryTable::rowMatchesQuery(Row row, IndexedQuery query) {
   for (int i = 0; i < query.size(); i++) {
     if (!entryMatchesRow(row, query[i]))
       return false;
@@ -37,11 +37,11 @@ bool MemoryTable::rowMatchesQuery(Row row, QueryWithIndices query) {
 }
 
 Row MemoryTable::findOne(Query query) {
-  QueryWithIndices indexedQuery = addIndicesToQuery(query);
+  IndexedQuery indexedQuery = addIndicesToQuery(query);
   if (indexedQuery.size() == 0)
     return NULL;
 
-  QueryEntryWithIndex id = indexedQuery[0];
+  IndexedQueryEntry id = indexedQuery[0];
   if (id.index == 0 && id.type == QUERY_EQ) {
     Row row = rows[id.value.i];
     if (rowMatchesQuery(row, indexedQuery))
@@ -60,11 +60,11 @@ Row MemoryTable::findOne(Query query) {
 }
 
 std::vector<Row> MemoryTable::findMany(Query query) {
-  QueryWithIndices indexedQuery = addIndicesToQuery(query);
+  IndexedQuery indexedQuery = addIndicesToQuery(query);
   if (indexedQuery.size() == 0)
     return std::vector<Row>();
 
-  QueryEntryWithIndex id = indexedQuery[0];
+  IndexedQueryEntry id = indexedQuery[0];
   std::vector<Row> result;
   if (id.index == 0 && id.type == QUERY_EQ) {
     Row row = rows[id.value.i];
