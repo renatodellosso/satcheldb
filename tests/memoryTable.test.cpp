@@ -69,9 +69,9 @@ TEST_CASE("insert allows overwrites") {
 TEST_CASE("insert fails with invalid ID") {
   MemoryTable table = getTable();
 
-  REQUIRE(!table.insert(getTestRow(-1, 1.23f, "Hello World")));
+  REQUIRE(!table.insert(getTestRow(-2, 1.23f, "Hello World")));
 
-  UnsanitizedRow row = getTestRow(-1, 1.23f, "Hello World");
+  UnsanitizedRow row = getTestRow(-2, 1.23f, "Hello World");
   BENCHMARK("insert invalid id") {
     return table.insert(row);
   };
@@ -461,9 +461,259 @@ TEST_CASE("updateOne works with single query") {
     }
   };
 
-  table.updateOne(query, update);
+  REQUIRE(table.updateOne(query, update));
 
   Row found = table.findOne(query);
   UnsanitizedRow expected = getTestRow(1, 3.0f, "3");
   REQUIRE(areRowsEqual(table.getSchema(), found, expected));
+
+  update = {
+    {
+      (char*)"num",
+      {
+        UPDATE_SET,
+        {
+          .f = 4.0f
+        }
+      }
+    }
+  };
+
+  BENCHMARK("updateOne existing single") {
+    table.updateOne(query, update);
+  };
+
+  // Benchmark larger tables
+  for(int i = 100; table.size() < 1000000; i++) {
+    table.insert(getTestRow(i, 4.0f + i/10.0f, "4"));
+  }
+
+  query = {
+    {
+      (char*)"name", 
+      {
+        QUERY_EQ,
+        {
+          .str = (char*)"3"
+        }
+      } 
+    }
+  };
+
+  BENCHMARK("updateOne existing with single float entry query in large table") {
+    return table.updateOne(query, update);
+  };
+}
+
+TEST_CASE("updateMany works with single query") {
+  MemoryTable table = getTable();
+
+  std::vector<UnsanitizedRow> rows = {
+    getTestRow(1, 2.0f, "3"),
+    getTestRow(2, 2.0f, "3"),
+    getTestRow(3, 2.0f, "3"),
+  };
+
+  for (auto row : rows)
+    table.insert(row);
+  table.insert(getTestRow(4, 1.0f, "4"));
+
+  Query query = {
+    { 
+      (char*)"num", 
+      {
+        QUERY_EQ,
+        {
+          .f = 2.0f
+        }
+      } 
+    }
+  };
+
+  Update update = {
+    {
+      (char*)"num",
+      {
+        UPDATE_SET,
+        {
+          .f = 3.0f
+        }
+      }
+    }
+  };
+
+  REQUIRE(table.updateMany(query, update) == rows.size());
+
+  std::vector<Row> result = table.findMany({
+    { 
+      (char*)"num", 
+      {
+        QUERY_EQ,
+        {
+          .f = 3.0f
+        }
+      } 
+    }
+  });
+  REQUIRE(result.size() == rows.size());
+  for (int i = 0; i < result.size(); i++) {
+    for (auto original : rows) {
+      original.cols[1].data = {.f = 3.0f};
+      if (original.cols[0].data.i == result[i][0].i)
+        REQUIRE(areRowsEqual(table.getSchema(), result[i], original));
+    }
+  }
+
+  BENCHMARK("updateMany existing") {
+    table.updateMany(query, update);
+  };
+
+  // Benchmark larger tables
+  for(int i = 100; table.size() < 1000000; i++) {
+    table.insert(getTestRow(i, 4.0f + i/10.0f, "4"));
+  }
+
+  query = {
+    {
+      (char*)"name", 
+      {
+        QUERY_EQ,
+        {
+          .str = (char*)"3"
+        }
+      }
+    }
+  };
+
+  BENCHMARK("updateMany existing with single float entry query in large table") {
+    return table.updateMany(query, update);
+  };
+}
+
+TEST_CASE("deleteOne works with single query", "[delete]") {
+  MemoryTable table = getTable();
+  UnsanitizedRow row = getTestRow(1, 2.0f, "3");
+
+  table.insert(row);
+  table.insert(getTestRow(2, 3.0f, "4"));
+
+  Query query = {
+    { 
+      (char*)"id", 
+      {
+        QUERY_EQ,
+        {
+          .i = 1
+        }
+      } 
+    }
+  };
+
+  long originalSize = table.size();
+  REQUIRE(areRowsEqual(table.getSchema(), table.deleteOne(query), row));
+  long size = table.size();
+  REQUIRE(size == originalSize - 1);
+
+  Row found = table.findOne(query);
+  REQUIRE(found == NULL);
+
+  table.insert(row);
+  BENCHMARK("deleteOne existing single") {
+    table.deleteOne(query);
+  };
+
+  // Benchmark larger tables
+  for(int i = 100; table.size() < 1000000; i++) {
+    table.insert(getTestRow(i, 4.0f + i/10.0f, "4"));
+  }
+
+  query = {
+    {
+      (char*)"name", 
+      {
+        QUERY_EQ,
+        {
+          .str = (char*)"3"
+        }
+      } 
+    }
+  };
+
+  BENCHMARK("deleteOne existing with single float entry query in large table") {
+    return table.deleteOne(query);
+  };
+}
+
+TEST_CASE("deleteMany works with single query", "[delete]") {
+  MemoryTable table = getTable();
+
+  std::vector<UnsanitizedRow> rows = {
+    getTestRow(1, 2.0f, "3"),
+    getTestRow(2, 2.0f, "3"),
+    getTestRow(3, 2.0f, "3"),
+  };
+
+  for (auto row : rows)
+    table.insert(row);
+  table.insert(getTestRow(4, 1.0f, "4"));
+
+  Query query = {
+    { 
+      (char*)"num", 
+      {
+        QUERY_EQ,
+        {
+          .f = 2.0f
+        }
+      } 
+    }
+  };
+  
+  int originalSize = table.size();
+
+  std::vector<Row> result = table.deleteMany(query);
+
+  REQUIRE(table.size() == originalSize - rows.size());
+
+  REQUIRE(result.size() == rows.size());
+  for (int i = 0; i < result.size(); i++) {
+    for (auto original : rows) {
+      if (original.cols[0].data.i == result[i][0].i)
+        REQUIRE(areRowsEqual(table.getSchema(), result[i], original));
+    }
+  }
+
+
+  // Add the rows back
+  for (auto row : rows)
+    table.insert(row);
+
+  BENCHMARK("deleteMany existing") {
+    table.deleteMany(query);
+  };
+
+  // Benchmark larger tables
+  for(int i = 100; table.size() < 1000000; i++) {
+    table.insert(getTestRow(i, 4.0f + i/10.0f, "4"));
+  }
+
+  // Add the rows back
+  for (auto row : rows)
+    table.insert(row);
+
+  query = {
+    {
+      (char*)"name", 
+      {
+        QUERY_EQ,
+        {
+          .str = (char*)"3"
+        }
+      }
+    }
+  };
+
+  BENCHMARK("deleteMany existing with single float entry query in large table") {
+    return table.deleteMany(query);
+  };
 }

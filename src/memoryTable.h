@@ -2,12 +2,15 @@
 
 #include "table.h"
 #include <unordered_map>
+#include <queue>
 
 class MemoryTable : public Table {
   public:
     MemoryTable(Schema schema);
     virtual Row findOne(Query query);
     virtual std::vector<Row> findMany(Query query);
+    virtual Row deleteOne(Query query);
+    virtual std::vector<Row> deleteMany(Query query);
     virtual long size();
   protected:
     virtual bool isIdTaken(int id);
@@ -17,4 +20,7 @@ class MemoryTable : public Table {
     std::unordered_map<int, Row> rows;
     bool rowMatchesQuery(Row row, IndexedQuery query);
     bool entryMatchesRow(Row row, IndexedQueryEntry entry);
+    void deleteRow(Row row);
+    std::queue<int> availableIds;
+    long nullRowCount;
 };

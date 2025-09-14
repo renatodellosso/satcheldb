@@ -12,7 +12,7 @@ Table::Table(Schema schema) {
 
 bool Table::isValidRow(UnsanitizedRow row) {
   // IDs must be >=0
-  if (row.len < 1 || row.cols[0].data.i < 0) {
+  if (row.len < 1 || row.cols[0].data.i < -1) {
 #ifdef DEBUG_IS_VALID_ROW_CAUSES
     throw std::invalid_argument("Invalid ID");
 #else
@@ -76,14 +76,25 @@ void applyUpdate(Row row, IndexedUpdate update) {
 }
 
 bool Table::updateOne(Query query, Update update) {
+  IndexedUpdate indexedUpdate = addIndicesToUpdate(update);
   Row row = findOne(query);
   if (row == NULL)
     return false;
 
-  IndexedUpdate indexedUpdate = addIndicesToUpdate(update);
 
   applyUpdate(row, indexedUpdate);
   return true;
+}
+
+int Table::updateMany(Query query, Update update) {
+  IndexedUpdate indexedUpdate = addIndicesToUpdate(update);
+
+  std::vector<Row> rows = findMany(query);
+  for (auto row : rows) {
+    applyUpdate(row, indexedUpdate);
+  }
+
+  return rows.size();
 }
 
 void moveIdToFrontOfQuery(IndexedQuery* query) {

@@ -11,6 +11,8 @@ Row extractData(UnsanitizedRow unsanitized) {
 }
 
 bool areRowsEqual(Schema schema, Row row, UnsanitizedRow other) {
+  if (row == NULL)
+    return false;
   if (schema.colCount != other.len)
     return false;
 

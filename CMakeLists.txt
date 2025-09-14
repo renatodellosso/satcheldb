@@ -1,4 +1,5 @@
 cmake_minimum_required(VERSION 3.15...4.0)
+set (CMAKE_CXX_STANDARD 11)
 project(SatchelDb VERSION 0.1
                   DESCRIPTION "A small DB"
                   LANGUAGES CXX)
