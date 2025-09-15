@@ -2,31 +2,21 @@
 #include <catch2/benchmark/catch_benchmark.hpp>
 #include <unordered_map>
 #include "../src/memoryTable.h"
+#include "utils.h"
 
 MemoryTable getTable() {
   return MemoryTable({
     3,
     new ValueType[3]{VT_INT, VT_FLOAT, VT_STRING},
-    std::unordered_map<char *, int> {
-      {(char*)"id", 0},
-      {(char*)"num", 1},
-      {(char*)"name", 2}
+    std::unordered_map<const char *, int> {
+      {(const char*)"id", 0},
+      {(const char*)"num", 1},
+      {(const char*)"name", 2}
+    },
+    new const char*[3] {
+      "id", "num", "name"
     }
   });
-}
-
-/**
- * Call outside of benchmarks to avoid increasing time
- */
-UnsanitizedRow getTestRow(int id, float data, const char* msg) {
-  return {
-    new TypedValue[3] {
-      intVal(id),
-      floatVal(data),
-      stringVal(msg)
-    },
-    3,
-  };
 }
 
 TEST_CASE("insert and get work with valid input") {

@@ -3,7 +3,7 @@
 
 
 TEST_CASE("returns true for valid schema", "[isValidSchema]") {
-  std::unordered_map<char*, int> nameToIndex;
+  std::unordered_map<const char*, int> nameToIndex;
   nameToIndex[(char*)"id"] = 0;
 
   Schema schema = {
@@ -18,7 +18,7 @@ TEST_CASE("returns true for valid schema", "[isValidSchema]") {
 }
 
 TEST_CASE("returns false for schema with 0 column count", "[isValidSchema]") {
-  std::unordered_map<char*, int> nameToIndex;
+  std::unordered_map<const char*, int> nameToIndex;
   nameToIndex[(char*)"id"] = 0;
 
   Schema schema = {
@@ -33,7 +33,7 @@ TEST_CASE("returns false for schema with 0 column count", "[isValidSchema]") {
 }
 
 TEST_CASE("returns false for schema with an ID column of the wrong type", "[isValidSchema]") {
-  std::unordered_map<char*, int> nameToIndex;
+  std::unordered_map<const char*, int> nameToIndex;
   nameToIndex[(char*)"id"] = 0;
 
   Schema schema = {
@@ -51,7 +51,7 @@ TEST_CASE("returns false for schema with an ID column of the wrong type", "[isVa
 }
 
 TEST_CASE("returns false for schema with an ID column in the wrong index", "[isValidSchema]") {
-  std::unordered_map<char*, int> nameToIndex;
+  std::unordered_map<const char*, int> nameToIndex;
   nameToIndex[(char*)"id"] = 1;
 
   Schema schema = {
@@ -64,7 +64,7 @@ TEST_CASE("returns false for schema with an ID column in the wrong index", "[isV
 
   REQUIRE(!isValidSchema(schema));
 
-  schema.nameToIndex = std::unordered_map<char*, int>(); // Remove col name
+  schema.nameToIndex = std::unordered_map<const char*, int>(); // Remove col name
   schema.colTypes[0] = VT_INT;
   REQUIRE(!isValidSchema(schema));
 }

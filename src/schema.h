@@ -5,7 +5,8 @@
 struct Schema {
   int colCount;
   ValueType* colTypes;
-  std::unordered_map<char*, int> nameToIndex;
+  std::unordered_map<const char*, int> nameToIndex;
+  const char** colNames;
 };
 
 bool isValidSchema(Schema schema);

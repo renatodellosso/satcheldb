@@ -14,8 +14,8 @@ typedef
   union {
     int i;
     float f;
-    char* str;
-  } 
+    const char* str;
+  }
 Value;
 
 struct TypedValue {

@@ -6,10 +6,10 @@ TEST_CASE("returns true for correct comparisons", "[areRowEqual]") {
   Schema schema = {
     3,
     new ValueType[3]{VT_INT, VT_FLOAT, VT_STRING},
-    std::unordered_map<char *, int> {
-      {(char*)"id", 0},
-      {(char*)"num", 1},
-      {(char*)"name", 2}
+    std::unordered_map<const char*, int> {
+      {(const char*)"id", 0},
+      {(const char*)"num", 1},
+      {(const char*)"name", 2}
     }
   };
 
@@ -33,10 +33,10 @@ TEST_CASE("returns false for correct comparisons", "[areRowEqual]") {
   Schema schema = {
     3,
     new ValueType[3]{VT_INT, VT_FLOAT, VT_STRING},
-    std::unordered_map<char *, int> {
-      {(char*)"id", 0},
-      {(char*)"num", 1},
-      {(char*)"name", 2}
+    std::unordered_map<const char*, int> {
+      {(const char*)"id", 0},
+      {(const char*)"num", 1},
+      {(const char*)"name", 2}
     }
   };
 

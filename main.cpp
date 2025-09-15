@@ -5,7 +5,7 @@ int main(void) {
   Schema schema = {
     1, 
     new ValueType[0], 
-    std::unordered_map<char*, int>()
+    std::unordered_map<const char*, int>()
   };
   bool valid = isValidSchema(schema);
   std::cout << "Hello, World!" << std::endl;
