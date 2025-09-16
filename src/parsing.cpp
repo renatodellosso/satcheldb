@@ -1,4 +1,5 @@
 #include "parsing.h"
+#define SIMDJSON_DEVELOPMENT_CHECKS 1
 
 // Use ptr instead of return to avoid memory being deleted
 void stringViewToCharPtr(std::string_view sv, char** str) {
@@ -11,10 +12,14 @@ void stringViewToCharPtr(std::string_view sv, char** str) {
 }
 
 bool parseRowEntry(ValueType type, const char* key, simdjson::ondemand::document* obj, Value* val) {
-  auto objVal = (*obj)[key];
+  simdjson::ondemand::value objVal;
+  auto error = (*obj)[key].get(objVal);
 
-  if (objVal.error())
+  if (error)
     return false;
+
+  // if (std::strcmp(key, "name") == 0)
+  //   throw std::invalid_argument(key);
 
   switch (type)
   {
@@ -34,7 +39,10 @@ bool parseRowEntry(ValueType type, const char* key, simdjson::ondemand::document
   }
 
   case VT_STRING: {
-    std::string_view valSv(objVal);
+    std::string_view valSv(objVal); // Segfaults
+    // objVal.get(valSv); // Segfault here
+    throw std::invalid_argument(key);
+
     char* str;
     stringViewToCharPtr(valSv, &str);
 
