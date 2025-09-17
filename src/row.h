@@ -50,7 +50,7 @@ struct QueryEntry {
   Value value;
 };
 
-typedef std::unordered_map<char*, QueryEntry> Query;
+typedef std::unordered_map<const char*, QueryEntry> Query;
 
 struct IndexedQueryEntry {
   QueryEntryType type;

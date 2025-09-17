@@ -5,6 +5,6 @@
 #include "simdjson.h"
 
 bool parseRow(Schema schema, simdjson::ondemand::document* doc, Row* row);
+bool parseQuery(Schema schema, simdjson::ondemand::document* doc, Query* query);
+bool parseUpdate(simdjson::ondemand::document* doc, Update* update);
 simdjson::ondemand::document convertRowToJson(Schema schema, Row row);
-Query parseQuery(simdjson::ondemand::document doc);
-Update parseUpdate(simdjson::ondemand::document doc);

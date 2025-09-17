@@ -122,7 +122,7 @@ IndexedQuery Table::addIndicesToQuery(Query query) {
   return indexedQuery;
 }
 
-IndexedQueryEntry Table::addIndicesToQueryEntry(char* key, QueryEntry entry) {
+IndexedQueryEntry Table::addIndicesToQueryEntry(const char* key, QueryEntry entry) {
     if (schema.nameToIndex.find(key) == schema.nameToIndex.end()) {
       return {
         QUERY_EQ, NULL, -1
@@ -161,7 +161,7 @@ IndexedUpdate Table::addIndicesToUpdate(Update update) {
   return indexedUpdate;
 }
 
-IndexedUpdateEntry Table::addIndicesToUpdateEntry(char* key, UpdateEntry entry) {
+IndexedUpdateEntry Table::addIndicesToUpdateEntry(const char* key, UpdateEntry entry) {
   if (schema.nameToIndex.find(key) == schema.nameToIndex.end()) {
     return {
       UPDATE_SET, NULL, -1

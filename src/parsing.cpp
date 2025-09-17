@@ -11,15 +11,12 @@ void stringViewToCharPtr(std::string_view sv, char** str) {
   (*str)[sv.length()] = '\0';
 }
 
-bool parseRowEntry(ValueType type, const char* key, simdjson::ondemand::document* obj, Value* val) {
+bool getValue(ValueType type, const char* key, simdjson::ondemand::document* obj, Value* val) {
   simdjson::ondemand::value objVal;
   auto error = (*obj)[key].get(objVal);
 
   if (error)
     return false;
-
-  // if (std::strcmp(key, "name") == 0)
-  //   throw std::invalid_argument(key);
 
   switch (type)
   {
@@ -52,9 +49,24 @@ bool parseRowEntry(ValueType type, const char* key, simdjson::ondemand::document
 bool parseRow(Schema schema, simdjson::ondemand::document* doc, Row* row) {
   for (int i = 0; i < schema.colCount; i++) {
     Value val;
-    if(!parseRowEntry(schema.colTypes[i], schema.colNames[i], doc, &val))
+    if(!getValue(schema.colTypes[i], schema.colNames[i], doc, &val))
       return false;
     (*row)[i] = val;
+  }
+
+  return true;
+}
+
+bool parseQuery(Schema schema, simdjson::ondemand::document* doc, Query* query) {
+  for (int i = 0; i < schema.colCount; i++) {
+    const char* key = schema.colNames[i];
+    Value val;
+    if(!getValue(schema.colTypes[i], key, doc, &val))
+      return false;
+    (*query)[key] = {
+      QUERY_EQ,
+      val
+    };
   }
 
   return true;

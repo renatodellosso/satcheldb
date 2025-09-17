@@ -27,20 +27,20 @@ TEST_CASE("parseRow works properly") {
   })"_padded;
 
   simdjson::ondemand::document obj = parser.iterate(json);
-  Row row;
+  Row row = new Value[schema.colCount];
   REQUIRE(parseRow(schema, &obj, &row));
 
   UnsanitizedRow expected = getTestRow(1, 2.0f, "test");
 
   REQUIRE(areRowsEqual(schema, row, expected));
 
+  json = R"({
+    "id": 1,
+    "num": 3.0,
+    "name": "test"
+  })"_padded;
+  // obj = parser.iterate(json); // Segfaults
   BENCHMARK("parseRow") {
-    json = R"({
-      "id": 1,
-      "num": 3.0,
-      "name": "test"
-    })"_padded;
-    obj = parser.iterate(json);
     return parseRow(schema, &obj, &row);
   };
 }

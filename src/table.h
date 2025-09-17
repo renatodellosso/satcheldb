@@ -25,8 +25,8 @@ class Table {
     virtual bool insertRaw(Row row) = 0;
     virtual Row getRaw(int id) = 0;
     IndexedQuery addIndicesToQuery(Query query);
-    IndexedQueryEntry addIndicesToQueryEntry(char* key, QueryEntry entry);
+    IndexedQueryEntry addIndicesToQueryEntry(const char* key, QueryEntry entry);
     IndexedUpdate addIndicesToUpdate(Update update);
-    IndexedUpdateEntry addIndicesToUpdateEntry(char* key, UpdateEntry entry);
+    IndexedUpdateEntry addIndicesToUpdateEntry(const char* key, UpdateEntry entry);
     Schema schema;
 };
