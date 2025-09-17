@@ -34,13 +34,13 @@ TEST_CASE("parseRow works properly") {
 
   REQUIRE(areRowsEqual(schema, row, expected));
 
-  // BENCHMARK("parseRow") {
-  //   json = R"({
-  //     "id": 1,
-  //     "num": 3.0,
-  //     "name": "test"
-  //   })"_padded;
-  //   obj = parser.iterate(json);
-  //   return parseRow(schema, &obj, &row);
-  // };
+  BENCHMARK("parseRow") {
+    json = R"({
+      "id": 1,
+      "num": 3.0,
+      "name": "test"
+    })"_padded;
+    obj = parser.iterate(json);
+    return parseRow(schema, &obj, &row);
+  };
 }
