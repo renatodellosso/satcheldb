@@ -28,48 +28,19 @@ TEST_CASE("parseRow works properly") {
 
   simdjson::ondemand::document obj = parser.iterate(json);
   Row row;
-  // REQUIRE(parseRow(schema, &obj, &row));
+  REQUIRE(parseRow(schema, &obj, &row));
 
-  // UnsanitizedRow expected = getTestRow(1, 2.0f, "test");
+  UnsanitizedRow expected = getTestRow(1, 2.0f, "test");
 
-  // REQUIRE(areRowsEqual(schema, row, expected));
+  REQUIRE(areRowsEqual(schema, row, expected));
 
-  BENCHMARK("parseRow") {
-    json = R"({
-      "id": 1,
-      "num": 3.0,
-      "name": "test"
-    })"_padded;
-    obj = parser.iterate(json);
-    return parseRow(schema, &obj, &row);
-  };
-}
-
-TEST_CASE("parse string") {
-  simdjson::ondemand::parser parser;
-  auto json = R"({
-    "name": "test"
-  })"_padded;
-  simdjson::ondemand::document obj = parser.iterate(json);
-  json = R"({
-    "name": "test"
-  })"_padded;
-  obj = parser.iterate(json);
-  simdjson::ondemand::document* ptr = &obj;
-
-  simdjson::ondemand::value objVal;
-  auto error = (*ptr)["name"].get(objVal);
-
-  if (error)
-    throw new std::invalid_argument("error");
-
-  std::string_view valSv(objVal);
-
-  char* str = new char[valSv.length() + 1];
-
-  for (int i = 0; i < valSv.length(); i++)
-    str[i] = valSv.at(i);
-  str[valSv.length()] = '\0';
-
-  REQUIRE(std::strcmp(str, "test") == 0);
+  // BENCHMARK("parseRow") {
+  //   json = R"({
+  //     "id": 1,
+  //     "num": 3.0,
+  //     "name": "test"
+  //   })"_padded;
+  //   obj = parser.iterate(json);
+  //   return parseRow(schema, &obj, &row);
+  // };
 }

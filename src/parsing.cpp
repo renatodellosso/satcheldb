@@ -39,16 +39,9 @@ bool parseRowEntry(ValueType type, const char* key, simdjson::ondemand::document
   }
 
   case VT_STRING: {
-    std::string_view valSv(objVal); // Segfaults
-    // objVal.get(valSv); // Segfault here
-    throw std::invalid_argument(key);
+    std::string_view valSv(objVal);
 
-    char* str;
-    stringViewToCharPtr(valSv, &str);
-
-    *val = {
-      .str = str
-    };
+    stringViewToCharPtr(valSv, (char**)&(val->str));
     break;
   }
   }
