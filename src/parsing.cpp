@@ -62,9 +62,24 @@ bool parseQuery(Schema schema, simdjson::ondemand::document* doc, Query* query) 
     const char* key = schema.colNames[i];
     Value val;
     if(!getValue(schema.colTypes[i], key, doc, &val))
-      return false;
+      continue;
     (*query)[key] = {
       QUERY_EQ,
+      val
+    };
+  }
+
+  return true;
+}
+
+bool parseUpdate(Schema schema, simdjson::ondemand::document* doc, Update* update) {
+  for (int i = 0; i < schema.colCount; i++) {
+    const char* key = schema.colNames[i];
+    Value val;
+    if(!getValue(schema.colTypes[i], key, doc, &val))
+      continue;
+    (*update)[key] = {
+      UPDATE_SET,
       val
     };
   }

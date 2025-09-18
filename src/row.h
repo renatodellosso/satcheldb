@@ -71,7 +71,7 @@ struct UpdateEntry {
   Value value;
 };
 
-typedef std::unordered_map<char*, UpdateEntry> Update;
+typedef std::unordered_map<const char*, UpdateEntry> Update;
 
 struct IndexedUpdateEntry {
   UpdateEntryType type;
@@ -80,3 +80,5 @@ struct IndexedUpdateEntry {
 };
 
 typedef std::vector<IndexedUpdateEntry> IndexedUpdate;
+
+bool areUpdatesEqual(Schema schema, Update u1, Update u2);

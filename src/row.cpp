@@ -79,21 +79,29 @@ bool areQueriesEqual(Schema schema, Query q1, Query q2) {
     if (index == schema.nameToIndex.end())
       return false; // Invalid key
 
-    switch (schema.colTypes[index->second])
-    {
-      case VT_INT:
-        if (entry.second.value.i != other->second.value.i)
-          return false;
-        break;
-      case VT_FLOAT:
-        if (entry.second.value.f != other->second.value.f)
-          return false;
-        break;
-      case VT_STRING:
-        if (std::strcmp(entry.second.value.str, other->second.value.str) != 0)
-          return false;
-        break;
-    };
+    if (!areValuesEqual(schema.colTypes[index->second], entry.second.value, other->second.value));
+  }
+
+  return true;
+}
+
+bool areUpdatesEqual(Schema schema, Update u1, Update u2) {
+  if (u1.size() != u2.size())
+    return false;
+
+  for (auto entry : u1) {
+    auto other = u2.find(entry.first);
+    if (other == u2.end())
+      return false; // Not found
+    
+    if (entry.second.type != other->second.type)
+      return false;
+    
+    auto index = schema.nameToIndex.find(entry.first);
+    if (index == schema.nameToIndex.end())
+      return false; // Invalid key
+
+    if (!areValuesEqual(schema.colTypes[index->second], entry.second.value, other->second.value));
   }
 
   return true;

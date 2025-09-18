@@ -99,3 +99,58 @@ TEST_CASE("parseQuery works properly") {
     return parseQuery(schema, &obj, &query);
   };
 }
+
+TEST_CASE("parseUpdate works properly") {
+  simdjson::ondemand::parser parser;
+  auto json = R"({
+    "id": 1,
+    "num": 2.0,
+    "name": "test"
+  })"_padded;
+
+  simdjson::ondemand::document obj = parser.iterate(json);
+  Update update;
+  REQUIRE(parseUpdate(schema, &obj, &update));
+
+  Update expected = {
+    {
+      "id",
+      {
+        UPDATE_SET,
+        {
+          .i = 1
+        }
+      }
+    },
+    {
+      "num",
+      {
+        UPDATE_SET,
+        {
+          .f = 2.0f
+        }
+      }
+    },
+    {
+      "name",
+      {
+        UPDATE_SET,
+        {
+          .str = "test"
+        }
+      }
+    },
+  };
+
+  REQUIRE(areUpdatesEqual(schema, update, expected));
+
+  json = R"({
+    "id": 1,
+    "num": 3.0,
+    "name": "test"
+  })"_padded;
+  // obj = parser.iterate(json); // Segfaults
+  BENCHMARK("parseUpdate") {
+    return parseUpdate(schema, &obj, &update);
+  };
+}
