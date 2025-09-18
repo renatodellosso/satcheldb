@@ -60,6 +60,8 @@ struct IndexedQueryEntry {
 
 typedef std::vector<IndexedQueryEntry> IndexedQuery;
 
+bool areQueriesEqual(Schema schema, Query q1, Query q2);
+
 enum UpdateEntryType {
   UPDATE_SET
 };

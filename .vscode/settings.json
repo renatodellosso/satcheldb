@@ -79,6 +79,7 @@
     "generator": "cpp",
     "stacktrace": "cpp",
     "text_encoding": "cpp",
-    "thread": "cpp"
+    "thread": "cpp",
+    "any": "cpp"
   }
 }

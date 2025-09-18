@@ -44,3 +44,58 @@ TEST_CASE("parseRow works properly") {
     return parseRow(schema, &obj, &row);
   };
 }
+
+TEST_CASE("parseQuery works properly") {
+  simdjson::ondemand::parser parser;
+  auto json = R"({
+    "id": 1,
+    "num": 2.0,
+    "name": "test"
+  })"_padded;
+
+  simdjson::ondemand::document obj = parser.iterate(json);
+  Query query;
+  REQUIRE(parseQuery(schema, &obj, &query));
+
+  Query expected = {
+    {
+      "id",
+      {
+        QUERY_EQ,
+        {
+          .i = 1
+        }
+      }
+    },
+    {
+      "num",
+      {
+        QUERY_EQ,
+        {
+          .f = 2.0f
+        }
+      }
+    },
+    {
+      "name",
+      {
+        QUERY_EQ,
+        {
+          .str = "test"
+        }
+      }
+    },
+  };
+
+  REQUIRE(areQueriesEqual(schema, query, expected));
+
+  json = R"({
+    "id": 1,
+    "num": 3.0,
+    "name": "test"
+  })"_padded;
+  // obj = parser.iterate(json); // Segfaults
+  BENCHMARK("parseQuery") {
+    return parseQuery(schema, &obj, &query);
+  };
+}
