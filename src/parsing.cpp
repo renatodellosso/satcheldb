@@ -1,4 +1,5 @@
 #include "parsing.h"
+#include <string>
 #define SIMDJSON_DEVELOPMENT_CHECKS 1
 
 // Use ptr instead of return to avoid memory being deleted
@@ -85,4 +86,42 @@ bool parseUpdate(Schema schema, simdjson::ondemand::document* doc, Update* updat
   }
 
   return true;
+}
+
+std::string stringifyCol(Schema schema, Row row, int index) {
+  std::string json = "\"";
+  json.append(schema.colNames[index]);
+  json.append("\":");
+
+  switch (schema.colTypes[index])
+  {
+  case VT_INT:
+    json.append(std::to_string(row[index].i));
+    break;
+  
+  case VT_FLOAT:
+    json.append(std::to_string(row[index].f));
+    break;
+  
+  case VT_STRING:
+    json.append("\"");
+    json.append(row[index].str);
+    json.append("\"");
+    break;
+  }
+
+  json.append(",");
+
+  return json;
+}
+
+void convertRowToJson(Schema schema, Row row, std::string* json) {
+  *json = "{";
+
+
+  for (int i = 0; i < schema.colCount; i++) {
+    json->append(stringifyCol(schema, row, i));
+  }
+
+  json->append("}");
 }

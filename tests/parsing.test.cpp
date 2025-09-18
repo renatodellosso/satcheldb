@@ -154,3 +154,29 @@ TEST_CASE("parseUpdate works properly") {
     return parseUpdate(schema, &obj, &update);
   };
 }
+
+TEST_CASE("convertRowToJson works properly") {
+  Row row = new Value[3] {
+    {
+      .i = 1
+    },
+    {
+      .f = 2.0f
+    },
+    {
+      .str = "test"
+    }
+  };
+
+  // Unneeded float precision isn't great
+  const char* expected = "{\"id\":1,\"num\":2.000000,\"name\":\"test\",}";
+
+  std::string result;
+  convertRowToJson(schema, row, &result);
+
+  REQUIRE(std::strcmp(result.c_str(), expected) == 0);
+
+  BENCHMARK("convertRowToJson") {
+    return convertRowToJson(schema, row, &result);
+  };
+}
